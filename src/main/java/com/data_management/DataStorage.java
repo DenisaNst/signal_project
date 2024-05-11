@@ -1,5 +1,6 @@
 package com.data_management;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,9 +88,17 @@ public class DataStorage {
         // DataReader reader = new SomeDataReaderImplementation("path/to/data");
         DataStorage storage = new DataStorage();
 
+        // Initialize the OutputFileDataReader with the output directory
+        String outputDirectory = "path/to/output/directory";
+        OutputFileDataReader reader = new OutputFileDataReader(outputDirectory);
+
         // Assuming the reader has been properly initialized and can read data into the
         // storage
-        // reader.readData(storage);
+
+        try {
+
+            // Read data from the output file into the storage
+            reader.readData(storage);
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
@@ -106,6 +115,11 @@ public class DataStorage {
         // Evaluate all patients' data to check for conditions that may trigger alerts
         for (Patient patient : storage.getAllPatients()) {
             alertGenerator.evaluateData(patient);
+        }
+
+        } catch (IOException e) {
+            // Handle IOException if reading data fails
+            System.err.println("Error reading data from output file: " + e.getMessage());
         }
     }
 }
