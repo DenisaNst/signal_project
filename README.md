@@ -69,4 +69,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## UML Diagram  
 
-- 
+- https://github.com/DenisaNst/signal_project/tree/master/uml_models

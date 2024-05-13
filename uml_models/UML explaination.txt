@@ -1,0 +1,11 @@
+UML1: In this frist diagram, the one about Alert Generator system, I thought that Alert Generator class uses Alert class and creates and instance of it, which will be managed by AlertManager. The Alert Manager class just sends message to the appropiate staff members. Also, The Alert class has the Alert Generator and use it to get alert for a specific patient. In this diagram I interted the usage of Data Generator and Patient Record which alert generator needs in orfer to have the necessary data for patients.
+
+UML2: In the DataStorage system, I used the interface DataReader which helps to read the patients data from a specific file. In order for DataStorage class to work, it needs to use the OutputDataFileReader from which it can get the information. The class PatientData owns PatientIdentifier so we can match every patient with his details. The PatientIdentifier owns DataStorage so in this way we can store every patient medical record, also in this manner we have multiplicity more than one. 
+
+UML3:  In the Patient system, we manly match every patient with he's record and store it and then generate the data.
+
+UML4:In the Data system we created classes for acces, for data listening, for parcing the data and for adaptation. I viewed this as the DataAcces uses every other class and the others depdend one on other, such as DataListener uses DataParser, which uses DataSourceAdapter.
+
+State Diagram: This Diagram is a very simple way to express how the system works. First, Alert Generator sends an Alert to the Alert object, or the Alert generates an alert ans send it to the Alert Generator. After this, we can check in the Data Storage if the trend is continuous. And if so, the Alert is acknowledged by the Medical Staff. Then, the Medical Staff can resolve the alert from the system or the alert will be automatically reolved by the system after the record of the patient will go to normal.
+
+Sequence Diagram: This is another way to simply understand and explain the system. With this diagram we can see exactly the steps that we do between the objects.
