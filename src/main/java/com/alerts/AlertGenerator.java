@@ -1,7 +1,6 @@
 package com.alerts;
 
 import com.data_management.DataStorage;
-import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.io.FileWriter;
@@ -17,8 +16,6 @@ import java.util.List;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
-    private Alert alert;
-    private PatientRecord patientRecord;
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -40,63 +37,51 @@ public class AlertGenerator {
      * alert
      * will be triggered.
      *
-     * @param patient the patient data to evaluate for alert conditions
      */
-    public void evaluateData(Patient patient) {
-        int patientId = patientRecord.getPatientId();
+    public void evaluateData(int patientId) {
         List<PatientRecord> records = dataStorage.getRecords(patientId, System.currentTimeMillis() - 3600000L, System.currentTimeMillis());
 
         for (int i = 0; i < records.size(); i++) {
             PatientRecord record = records.get(i);
-            String patientId1 = alert.getPatientId();
 
-            // Blood Pressure Data Alerts
             if (record.getRecordType().equals("BloodPressure")) {
                 if (i >= 2) {
-                    // Trend Alert
                     if (isIncreasingTrend(records, i) || isDecreasingTrend(records, i)) {
-                        triggerAlert(new Alert(patientId1, "Blood Pressure Trend Alert", record.getTimestamp()));
+                        triggerAlert(new Alert(patientId, "Blood Pressure Trend Alert", record.getTimestamp()));
                     }
                 }
                 // Critical Threshold Alert
                 double systolicPressure = record.getMeasurementValue();
                 double diastolicPressure = records.get(i + 1).getMeasurementValue();
                 if (systolicPressure > 180 || systolicPressure < 90 || diastolicPressure > 120 || diastolicPressure < 60) {
-                    triggerAlert(new Alert(patientId1, "Critical Blood Pressure Alert", record.getTimestamp()));
+                    triggerAlert(new Alert(patientId, "Critical Blood Pressure Alert", record.getTimestamp()));
                 }
             }
 
-            // Blood Saturation Data Alerts
             else if (record.getRecordType().equals("BloodSaturation")) {
                 double saturation = record.getMeasurementValue();
                 if (saturation < 92) {
-                    triggerAlert(new Alert(patientId1, "Low Saturation Alert", record.getTimestamp()));
+                    triggerAlert(new Alert(patientId, "Low Saturation Alert", record.getTimestamp()));
                 }
                 if (i >= 6 && isRapidDrop(records, i)) {
-                    triggerAlert(new Alert(patientId1, "Rapid Drop Alert", record.getTimestamp()));
+                    triggerAlert(new Alert(patientId, "Rapid Drop Alert", record.getTimestamp()));
                 }
             }
 
-            // Combined Alert: Hypotensive Hypoxemia Alert
             else if (record.getRecordType().equals("BloodPressure") && records.get(i + 1).getRecordType().equals("BloodSaturation")) {
                 double systolicPressure = record.getMeasurementValue();
                 double saturation = records.get(i + 1).getMeasurementValue();
                 if (systolicPressure < 90 && saturation < 92) {
-                    triggerAlert(new Alert(patientId1, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                    triggerAlert(new Alert(patientId, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
                 }
             }
 
-            // ECG Data Alerts
             else if (record.getRecordType().equals("ECG")) {
                 int heartRate = (int) record.getMeasurementValue();
                 if (heartRate < 50 || heartRate > 100) {
-                    triggerAlert(new Alert(patientId1, "Abnormal Heart Rate Alert", record.getTimestamp()));
+                    triggerAlert(new Alert(patientId, "Abnormal Heart Rate Alert", record.getTimestamp()));
                 }
             }
-
-
-            // Triggered Alert
-            // Implementation for triggered alert will depend on the integration with HealthDataGenerator
         }
     }
 
@@ -129,7 +114,6 @@ public class AlertGenerator {
         return saturationDrop >= 5 && timeDifferenceMinutes <= 10;
     }
 
-
     /**
      * Triggers an alert for the monitoring system. This method can be extended to
      * notify medical staff, log the alert, or perform other actions. The method
@@ -144,7 +128,6 @@ public class AlertGenerator {
         System.out.println("Condition: " + alert.getCondition());
         System.out.println("Timestamp: " + alert.getTimestamp());
 
-        // Log the alert (example: write alert details to a log file)
         try (PrintWriter writer = new PrintWriter(new FileWriter("alert_log.txt", true))) {
             writer.println("Alert Triggered:");
             writer.println("Patient ID: " + alert.getPatientId());
@@ -156,5 +139,4 @@ public class AlertGenerator {
         }
 
     }
-
 }

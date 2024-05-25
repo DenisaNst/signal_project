@@ -28,7 +28,7 @@ public class AlertGeneratorTest {
         patient.addRecord(140, "BloodPressure", System.currentTimeMillis());
         patient.addRecord(91, "BloodSaturation", System.currentTimeMillis());
 
-        alertGenerator.evaluateData(patient);
+        alertGenerator.evaluateData();
 
         List<Alert> alerts = ((MockDataStorage) dataStorage).getGeneratedAlerts();
 
