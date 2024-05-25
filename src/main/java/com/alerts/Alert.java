@@ -11,7 +11,7 @@ public class Alert {
         this.condition = condition;
         this.timestamp = timestamp;
     }
-
+    // I am testing the git
     public int getPatientId() {
         return patientId;
     }
