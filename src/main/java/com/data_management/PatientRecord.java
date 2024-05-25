@@ -14,6 +14,7 @@ public class PatientRecord {
     private String recordType; // Example: ECG, blood pressure, etc.
     private double measurementValue; // Example: heart rate
     private long timestamp;
+    private String measurementValue2;
 
     /**
      * Constructs a new patient record with specified details.
@@ -28,6 +29,12 @@ public class PatientRecord {
     public PatientRecord(int patientId, double measurementValue, String recordType, long timestamp) {
         this.patientId = patientId;
         this.measurementValue = measurementValue;
+        this.recordType = recordType;
+        this.timestamp = timestamp;
+    }
+    public PatientRecord(int patientId, String measurementValue, String recordType, long timestamp) {
+        this.patientId = patientId;
+        this.measurementValue2 = measurementValue;
         this.recordType = recordType;
         this.timestamp = timestamp;
     }
@@ -48,6 +55,9 @@ public class PatientRecord {
      */
     public double getMeasurementValue() {
         return measurementValue;
+    }
+    public String getMeasurementValue2() {
+        return measurementValue2;
     }
 
     /**

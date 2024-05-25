@@ -39,6 +39,14 @@ public class DataStorage {
         }
         patient.addRecord(timestamp, recordType, measurementValue);
     }
+    public void addPatientData2(int patientId, long timestamp, String recordType, String measurementValue) {
+        Patient patient = patientMap.get(patientId);
+        if (patient == null) {
+            patient = new Patient(patientId);
+            patientMap.put(patientId, patient);
+        }
+        patient.addRecord2(timestamp, recordType, measurementValue);
+    }
 
     /**
      * Retrieves a list of PatientRecord objects for a specific patient, filtered by a time range.
@@ -84,16 +92,20 @@ public class DataStorage {
 
             List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
             for (PatientRecord record : records) {
-                System.out.println("Patient ID: " + record.getPatientId() +
+                System.out.print("Patient ID: " + record.getPatientId() +
                         ", Timestamp: " + record.getTimestamp() +
                         ", Label: " + record.getRecordType() +
-                        ", Data: " + record.getMeasurementValue());
+                        ", Data: ");
+                if (record.getMeasurementValue2() != null) {
+                    System.out.println(record.getMeasurementValue2());
+                } else {
+                    System.out.println(record.getMeasurementValue());
+                }
             }
 
             AlertGenerator alertGenerator = new AlertGenerator(storage);
 
             for (Patient patient : storage.getAllPatients()) {
-
                 alertGenerator.evaluateData(patient.getPatientId());
             }
 

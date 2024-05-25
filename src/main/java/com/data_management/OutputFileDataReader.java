@@ -47,11 +47,26 @@ public class OutputFileDataReader implements DataReader {
                     long timestamp = Long.parseLong(fields[1].split(":")[1].trim());
                     String recordType = fields[2].split(":")[1].trim();
                     String data = fields[3].split(":")[1].trim();
-                    double measurementValue = data.equals("triggered") ? 1.0 : 0.0;
-
-                    dataStorage.addPatientData(patientId, timestamp, recordType, measurementValue);
+                    String measurement1;
+                    double measurement2;
+                    if(data.equals("triggered")) {
+                        measurement1 = "triggered";
+                        dataStorage.addPatientData2(patientId, timestamp, recordType, measurement1);
+                    } else if(data.equals("resolved")){
+                        measurement1 = "resolved";
+                        dataStorage.addPatientData2(patientId, timestamp, recordType, measurement1);
+                    } else if (data.matches("\\d+\\.\\d+%")) { // Corrected regex for percentage data
+                        String numberPart = data.replaceAll("[^\\d.]", "");
+                        double measurement = Double.parseDouble(numberPart) / 100.0; // divide by 100 to convert percentage to fraction
+                        dataStorage.addPatientData(patientId, timestamp, recordType, measurement);
+                    } else {
+                        measurement2 = Double.parseDouble(data);
+                        dataStorage.addPatientData(patientId, timestamp, recordType, measurement2);
+                    }
                 }
             }
         }
     }
 }
+
+

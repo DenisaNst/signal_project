@@ -41,6 +41,10 @@ public class Patient {
         PatientRecord record = new PatientRecord(this.patientId, measurementValue, recordType, timestamp);
         this.patientRecords.add(record);
     }
+    public void addRecord2(long timestamp, String recordType, String measurementValue) {
+        PatientRecord record = new PatientRecord(this.patientId, measurementValue, recordType, timestamp);
+        this.patientRecords.add(record);
+    }
 
     /**
      * Retrieves a list of PatientRecord objects for this patient that fall within a
