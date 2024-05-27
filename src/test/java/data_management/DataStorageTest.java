@@ -1,30 +1,56 @@
 package data_management;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
 import com.data_management.DataStorage;
 import com.data_management.PatientRecord;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-class DataStorageTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class DataStorageTest {
+
+    private DataStorage dataStorage;
+
+    @BeforeEach
+    void setUp() {
+        dataStorage = new DataStorage();
+    }
 
     @Test
-    void testAddAndGetRecords() {
-        // DataReader reader
-            DataStorage storage = new DataStorage();
+    void addPatientData_NewPatient() {
+        dataStorage.addPatientData(1, 1622136000000L, "BloodPressure", 120);
+        List<PatientRecord> records = dataStorage.getRecords(1, 0, Long.MAX_VALUE);
 
-            // Add some sample patient data
-            storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
-            storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
-
-            // Retrieve records for patient ID 1 within the specified time range
-            List<PatientRecord> records = storage.getRecords(1, 1714376789050L, 1714376789051L);
-
-            // Assert statements to validate the results
-            assertEquals(2, records.size()); // Check if two records are retrieved
-            assertEquals(100.0, records.get(0).getMeasurementValue()); // Validate the measurement value of the first record
-
+        assertEquals(1, records.size());
+        assertEquals(1622136000000L, records.get(0).getTimestamp());
+        assertEquals("BloodPressure", records.get(0).getRecordType());
+        assertEquals(120, records.get(0).getMeasurementValue());
     }
+
+    @Test
+    void addPatientData_ExistingPatient() {
+        dataStorage.addPatientData(1, 1622136000000L, "BloodPressure", 120);
+        dataStorage.addPatientData(1, 1622137000000L, "BloodPressure", 130);
+        List<PatientRecord> records = dataStorage.getRecords(1, 0, Long.MAX_VALUE);
+
+        assertEquals(2, records.size());
+        assertEquals(1622136000000L, records.get(0).getTimestamp());
+        assertEquals("BloodPressure", records.get(0).getRecordType());
+        assertEquals(120, records.get(0).getMeasurementValue());
+        assertEquals(1622137000000L, records.get(1).getTimestamp());
+        assertEquals("BloodPressure", records.get(1).getRecordType());
+        assertEquals(130, records.get(1).getMeasurementValue());
+    }
+
+    @Test
+    void getRecords_Empty() {
+        List<PatientRecord> records = dataStorage.getRecords(1, 0, Long.MAX_VALUE);
+
+        assertEquals(0, records.size());
+    }
+
+    // Add more test cases for other methods as needed
+
 }

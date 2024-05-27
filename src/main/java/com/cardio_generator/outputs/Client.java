@@ -7,11 +7,11 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class SignalGeneratorClient extends WebSocketClient {
+public class Client extends WebSocketClient {
 
     private DataStorage dataStorage;
 
-    public SignalGeneratorClient(URI serverUri, DataStorage dataStorage) {
+    public Client(URI serverUri, DataStorage dataStorage) {
         super(serverUri);
         this.dataStorage = dataStorage;
     }
@@ -34,7 +34,8 @@ public class SignalGeneratorClient extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
-        System.err.println("An error occurred:" + ex);
+        System.err.println("An error occurred: " + ex.getMessage());
+        ex.printStackTrace();
     }
 
     private void parseAndStoreMessage(String message) {
@@ -57,14 +58,14 @@ public class SignalGeneratorClient extends WebSocketClient {
     }
 
     public static void main(String[] args) {
-        int port = 12345;  // Replace with the actual port number your server is running on
+        int port = 8080; // Use the same port as the server
         String uri = "ws://localhost:" + port;
 
-        DataStorage dataStorage = new DataStorage();  // Ensure you have an instance of DataStorage
+        DataStorage dataStorage = new DataStorage();
 
         try {
-            SignalGeneratorClient client = new SignalGeneratorClient(new URI(uri), dataStorage);
-            client.connectBlocking();
+            Client client = new Client(new URI(uri), dataStorage);
+            client.connectBlocking(); // Blocks until the connection is established
         } catch (URISyntaxException | InterruptedException e) {
             e.printStackTrace();
         }

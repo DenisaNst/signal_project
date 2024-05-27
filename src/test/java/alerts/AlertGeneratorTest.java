@@ -3,62 +3,69 @@ package alerts;
 import com.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.data_management.DataStorage;
-import com.data_management.Patient;
 import com.data_management.PatientRecord;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-public class AlertGeneratorTest {
-    private DataStorage dataStorage;
-    private AlertGenerator alertGenerator;
+class AlertGeneratorTest {
+    private DataStorage mockDataStorage = Mockito.mock(DataStorage.class);
+    private AlertGenerator alertGenerator = new AlertGenerator(mockDataStorage);
 
-    @BeforeEach
-    void setUp() {
-        dataStorage = new MockDataStorage();
-        alertGenerator = new AlertGenerator(dataStorage);
+    @Test
+    void evaluateData_NoRecords_NoAlertTriggered() {
+        int patientId = 1;
+        when(mockDataStorage.getRecords(eq(patientId), anyLong(), anyLong())).thenReturn(Collections.emptyList());
+
+        alertGenerator.evaluateData(patientId);
+
+        verify(alertGenerator, never()).triggerAlert(any());
     }
 
     @Test
-    void testEvaluateData() {
-        Patient patient = new Patient(1);
-        patient.addRecord(120, "HeartRate", System.currentTimeMillis());
-        patient.addRecord(140, "BloodPressure", System.currentTimeMillis());
-        patient.addRecord(91, "BloodSaturation", System.currentTimeMillis());
+    void evaluateData_BloodPressureStable_NoAlertTriggered() {
+        int patientId = 1;
+        long currentTime = System.currentTimeMillis();
+        List<PatientRecord> records = Arrays.asList(
+                new PatientRecord(patientId, "BloodPressure", String.valueOf(currentTime - 3500000L), 120),
+                new PatientRecord(patientId, "BloodPressure", String.valueOf(currentTime - 3400000L), 120),
+                new PatientRecord(patientId, "BloodPressure", String.valueOf(currentTime - 3300000L), 120)
+        );
 
-        alertGenerator.evaluateData();
+        when(mockDataStorage.getRecords(eq(patientId), anyLong(), anyLong())).thenReturn(records);
 
-        List<Alert> alerts = ((MockDataStorage) dataStorage).getGeneratedAlerts();
+        alertGenerator.evaluateData(patientId);
 
-        assertEquals(1, alerts.size());
-
-        Alert alert = alerts.get(0);
-        assertEquals("1", alert.getPatientId());
-        assertEquals("Low Saturation Alert", alert.getCondition());
+        verify(alertGenerator, never()).triggerAlert(any());
     }
 
-    private static class MockDataStorage extends DataStorage implements alerts.MockDataStorage {
-        private List<Alert> generatedAlerts = new ArrayList<>();
+    @Test
+    void triggerAlert_WritesToFile_ErrorWritingToFile() throws IOException {
+        Alert alert = new Alert(1, "Test Alert", System.currentTimeMillis());
 
-        @Override
-        public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
+        PrintWriter mockWriter = Mockito.mock(PrintWriter.class);
+        when(mockWriter.append(any(CharSequence.class))).thenThrow(new IOException("Test exception"));
 
-        }
+        alertGenerator = new AlertGenerator(mockDataStorage) {
+            protected PrintWriter getWriter(String filename) throws IOException {
+                return mockWriter;
+            }
+        };
 
-        @Override
-        public List<PatientRecord> getRecords(int patientId, long startTime, long endTime) {
-            return new ArrayList<>();
-        }
+        alertGenerator.triggerAlert(alert);
 
-        @Override
-        public void triggerAlert(Alert alert) {
-            generatedAlerts.add(alert);
-        }
-
-        public List<Alert> getGeneratedAlerts() {
-            return generatedAlerts;
-        }
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(System.err, times(1)).println(captor.capture());
+        assertTrue(captor.getValue().contains("Error writing alert to log file: Test exception"));
     }
 }
