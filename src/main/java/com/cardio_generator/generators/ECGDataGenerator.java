@@ -4,6 +4,10 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
+/**
+ * The BloodLevelsDataGenerator class implements the PatientDataGenerator interface
+ * and generates blood levels data for patients.
+ */
 public class ECGDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private double[] lastEcgValues;
@@ -17,6 +21,12 @@ public class ECGDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates ECG data for a patient and outputs it using the provided output strategy.
+     *
+     * @param patientId       the ID of the patient for which to generate data
+     * @param outputStrategy  the output strategy to use for outputting the generated data
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         // TODO Check how realistic this data is and make it more realistic if necessary
@@ -30,6 +40,13 @@ public class ECGDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Simulates an ECG waveform for a patient.
+     *
+     * @param patientId     the ID of the patient for which to simulate the ECG waveform
+     * @param lastEcgValue  the last ECG value for the patient
+     * @return the simulated ECG value
+     */
     private double simulateEcgWaveform(int patientId, double lastEcgValue) {
         // Simplified ECG waveform generation based on sinusoids
         double hr = 60.0 + random.nextDouble() * 20.0; // Simulate heart rate variability between 60 and 80 bpm

@@ -2,9 +2,10 @@ package com.data_management;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import com.alerts.AlertGenerator;
 
 /**
@@ -12,13 +13,10 @@ import com.alerts.AlertGenerator;
  * This class serves as a repository for all patient records, organized by patient IDs.
  */
 public class DataStorage {
-    private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
+    private ConcurrentMap<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
 
-    /**
-     * Constructs a new instance of DataStorage, initializing the underlying storage structure.
-     */
     public DataStorage() {
-        this.patientMap = new HashMap<>();
+        this.patientMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -32,19 +30,11 @@ public class DataStorage {
      * @param timestamp        the time at which the measurement was taken, in milliseconds since the Unix epoch
      */
     public void addPatientData(int patientId, long timestamp, String recordType, double measurementValue) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
+        Patient patient = patientMap.computeIfAbsent(patientId, k -> new Patient(patientId));
         patient.addRecord(timestamp, recordType, measurementValue);
     }
     public void addPatientData2(int patientId, long timestamp, String recordType, String measurementValue) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
+        Patient patient = patientMap.computeIfAbsent(patientId, k -> new Patient(patientId));
         patient.addRecord2(timestamp, recordType, measurementValue);
     }
 

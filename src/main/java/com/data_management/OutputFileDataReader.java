@@ -3,6 +3,7 @@ package com.data_management;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * This class is made to read data from an output file generated
  */
-public class OutputFileDataReader implements DataReader {
+public class OutputFileDataReader implements DataReader2 {
     private final String outputDirectory;
 
     public OutputFileDataReader(String outputDirectory) {
@@ -24,8 +25,7 @@ public class OutputFileDataReader implements DataReader {
      * @param dataStorage the storage where data will be stored
      * @throws IOException
      */
-    @Override
-    public void readData(DataStorage dataStorage) throws IOException {
+    public void readData(DataStorage dataStorage) throws IOException { // Not overriding any method in the interface
         Path outputDirPath = Paths.get(outputDirectory);
         if (!Files.exists(outputDirPath) || !Files.isDirectory(outputDirPath)) {
             throw new IOException("Output directory not found: " + outputDirPath);
@@ -67,6 +67,16 @@ public class OutputFileDataReader implements DataReader {
             }
         }
     }
+
+    /**
+     * This method is not supported by this class and will throw an exception if called.
+     * @param uri
+     * @param dataStorage
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     */
+    @Override
+    public void readRealTimeData(String uri, DataStorage dataStorage) throws URISyntaxException, InterruptedException {
+        throw new UnsupportedOperationException("This class does not support reading real-time data.");
+    }
 }
-
-

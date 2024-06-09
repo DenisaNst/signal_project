@@ -56,6 +56,12 @@ public class PatientRecord {
     public double getMeasurementValue() {
         return measurementValue;
     }
+
+    /**
+     * Returns the measurement value of this record.
+     *
+     * @return the measurement value
+     */
     public String getMeasurementValue2() {
         return measurementValue2;
     }

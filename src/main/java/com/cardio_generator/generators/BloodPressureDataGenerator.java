@@ -4,12 +4,20 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
+/**
+ * The BloodLevelsDataGenerator class implements the PatientDataGenerator interface
+ * and generates blood levels data for patients.
+ */
 public class BloodPressureDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
 
     private int[] lastSystolicValues;
     private int[] lastDiastolicValues;
 
+    /**
+     * Constructor for BloodPressureDataGenerator.
+     * @param patientCount The number of patients to generate data for.
+     */
     public BloodPressureDataGenerator(int patientCount) {
         lastSystolicValues = new int[patientCount + 1];
         lastDiastolicValues = new int[patientCount + 1];
@@ -21,6 +29,11 @@ public class BloodPressureDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates blood pressure data for a patient.
+     * @param patientId The ID of the patient to generate data for.
+     * @param outputStrategy The output strategy to use for the generated data.
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {

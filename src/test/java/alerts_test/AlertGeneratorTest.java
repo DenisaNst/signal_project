@@ -1,4 +1,4 @@
-package alerts;
+package alerts_test;
 
 import com.alerts.Alert;
 import com.alerts.AlertGenerator;
@@ -18,10 +18,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests for the AlertGenerator class.
+ */
 class AlertGeneratorTest {
     private DataStorage mockDataStorage = Mockito.mock(DataStorage.class);
     private AlertGenerator alertGenerator = new AlertGenerator(mockDataStorage);
 
+    /**
+     * Tests that the evaluateData method correctly triggers an alert when the blood pressure is too high.
+     */
     @Test
     void evaluateData_NoRecords_NoAlertTriggered() {
         int patientId = 1;
@@ -32,6 +38,9 @@ class AlertGeneratorTest {
         verify(alertGenerator, never()).triggerAlert(any());
     }
 
+    /**
+     * Tests that the evaluateData method correctly triggers an alert when the blood pressure is too high.
+     */
     @Test
     void evaluateData_BloodPressureStable_NoAlertTriggered() {
         int patientId = 1;
@@ -49,6 +58,9 @@ class AlertGeneratorTest {
         verify(alertGenerator, never()).triggerAlert(any());
     }
 
+    /**
+     * Tests that the evaluateData method correctly triggers an alert when the blood pressure is too high.
+     */
     @Test
     void triggerAlert_WritesToFile_ErrorWritingToFile() throws IOException {
         Alert alert = new Alert(1, "Test Alert", System.currentTimeMillis());

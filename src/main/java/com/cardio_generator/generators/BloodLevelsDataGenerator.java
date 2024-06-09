@@ -4,6 +4,10 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
+/**
+ * The BloodLevelsDataGenerator class implements the PatientDataGenerator interface
+ * and generates blood levels data for patients.
+ */
 public class BloodLevelsDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private final double[] baselineCholesterol;
@@ -24,6 +28,12 @@ public class BloodLevelsDataGenerator implements PatientDataGenerator {
         }
     }
 
+    /**
+     * Generates blood levels data for a patient and outputs it using the provided output strategy.
+     *
+     * @param patientId is the ID of the patient.
+     * @param outputStrategy is the output strategy to use for displaying the generated data.
+     */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {

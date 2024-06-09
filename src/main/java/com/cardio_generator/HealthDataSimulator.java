@@ -1,5 +1,6 @@
 package com.cardio_generator;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -92,9 +93,10 @@ public class HealthDataSimulator {
                         } else if (outputArg.startsWith("websocket:")) {
                             try {
                                 int port = Integer.parseInt(outputArg.substring(10));
-                                // Initialize your WebSocket output strategy here
-                                outputStrategy = new WebSocketOutputStrategy(port);
-                                System.out.println("WebSocket output will be on port: " + port);
+                                MyWebSocketServer server = new MyWebSocketServer(new InetSocketAddress(port));
+                                server.start();
+                                outputStrategy = new WebSocketOutputStrategy(server);
+                                System.out.println("WebSocket server started on port: " + port);
                             } catch (NumberFormatException e) {
                                 System.err.println(
                                         "Invalid port for WebSocket output. Please specify a valid port number.");

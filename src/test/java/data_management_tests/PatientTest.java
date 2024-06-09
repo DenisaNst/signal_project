@@ -1,4 +1,4 @@
-package data_management;
+package data_management_tests;
 
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PatientTest {
 
+    /**
+     * Tests the addRecord and getRecords methods of the Patient class.
+     */
     @Test
     void testAddAndGetRecords() {
         Patient patient = new Patient(1);
