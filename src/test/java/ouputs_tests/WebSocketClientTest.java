@@ -50,12 +50,47 @@ public class WebSocketClientTest {
     }
 
     /**
-     * Tests that the client handles an exception when storing a message.
+     * Tests that the client handles a message with an invalid number format.
      */
     @Test
-    public void onMessage_handlesException() {
-        doThrow(new RuntimeException("Error processing message")).when(dataStorage).addPatientData(anyInt(), anyLong(), anyString(), anyDouble());
-        client.onMessage("1,1000,HeartRate,80.0");
-        verify(dataStorage, times(1)).addPatientData(anyInt(), anyLong(), anyString(), anyDouble());
+    public void onMessage_handlesNumberFormatException() {
+        client.onMessage("1,1000,HeartRate,invalid_number");
+        verify(dataStorage, never()).addPatientData(anyInt(), anyLong(), anyString(), anyDouble());
+    }
+
+    /**
+     * Tests that the client handles a message with an invalid number of parts.
+     */
+    @Test
+    public void onMessage_handlesInvalidPartsCount() {
+        client.onMessage("1,1000,HeartRate");
+        verify(dataStorage, never()).addPatientData(anyInt(), anyLong(), anyString(), anyDouble());
+    }
+
+    /**
+     * Tests that the client handles a message with a percentage sign in the measurement value.
+     */
+    @Test
+    public void onMessage_handlesPercentageSign() {
+        client.onMessage("1,1000,HeartRate,80%");
+        verify(dataStorage, times(1)).addPatientData(anyInt(), anyLong(), anyString(), eq(80.0));
+    }
+
+    /**
+     * Tests that the client handles a message with a "triggered" status.
+     */
+    @Test
+    public void onMessage_handlesTriggeredStatus() {
+        client.onMessage("1,1000,HeartRate,triggered");
+        verify(dataStorage, times(1)).addPatientData(anyInt(), anyLong(), anyString(), eq(1.0));
+    }
+
+    /**
+     * Tests that the client handles a message with a "resolved" status.
+     */
+    @Test
+    public void onMessage_handlesResolvedStatus() {
+        client.onMessage("1,1000,HeartRate,resolved");
+        verify(dataStorage, times(1)).addPatientData(anyInt(), anyLong(), anyString(), eq(0.0));
     }
 }

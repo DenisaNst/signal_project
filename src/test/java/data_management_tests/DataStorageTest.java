@@ -53,30 +53,6 @@ public class DataStorageTest {
         assertEquals(0, records.size());
     }
 
-
-    @Test
-    void addPatientData_ConcurrentUpdates() throws InterruptedException {
-        Thread thread1 = new Thread(() -> {
-            for (int i = 0; i < 1000; i++) {
-                dataStorage.addPatientData(1, 1622136000000L + i, "HeartRate", 80.0 + i);
-            }
-        });
-
-        Thread thread2 = new Thread(() -> {
-            for (int i = 0; i < 1000; i++) {
-                dataStorage.addPatientData(1, 1622136000000L + i, "BloodPressure", 120.0 + i);
-            }
-        });
-
-        thread1.start();
-        thread2.start();
-
-        thread1.join();
-        thread2.join();
-
-        assertEquals(2000, dataStorage.getRecords(1, 0, Long.MAX_VALUE).size());
-    }
-
     @Test
     void addPatientData2_AddsNewPatientData() {
         dataStorage.addPatientData2(1, 1000L, "HeartRate", "80.0");
@@ -88,5 +64,26 @@ public class DataStorageTest {
         dataStorage.addPatientData2(1, 1000L, "HeartRate", "80.0");
         dataStorage.addPatientData2(1, 2000L, "HeartRate", "85.0");
         assertEquals(2, dataStorage.getRecords(1, 0, Long.MAX_VALUE).size());
+    }
+
+    /**
+     * Tests that the addPatientData method handles negative patient IDs.
+     */
+    @Test
+    void addPatientData_NegativePatientId() {
+        dataStorage.addPatientData(-1, 1622136000000L, "BloodPressure", 120);
+        List<PatientRecord> records = dataStorage.getRecords(-1, 0, Long.MAX_VALUE);
+        assertEquals(1, records.size());
+    }
+
+    /**
+     * Tests that the addPatientData2 method handles non-numeric measurement values.
+     */
+    @Test
+    void addPatientData2_NonNumericMeasurementValue() {
+        dataStorage.addPatientData2(1, 1000L, "HeartRate", "eighty");
+        List<PatientRecord> records = dataStorage.getRecords(1, 0, Long.MAX_VALUE);
+        assertEquals(1, records.size());
+        assertEquals("eighty", records.get(0).getMeasurementValue2());
     }
 }

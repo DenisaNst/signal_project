@@ -1,6 +1,8 @@
 package com.alerts;
 
-// Represents an alert
+/**
+ * This class represents an alert that is triggered when a patient's health condition is critical.
+ */
 public class Alert {
     private int patientId;
     private String condition;
@@ -11,7 +13,7 @@ public class Alert {
         this.condition = condition;
         this.timestamp = timestamp;
     }
-    // I am testing the git
+
     public int getPatientId() {
         return patientId;
     }
@@ -23,4 +25,7 @@ public class Alert {
     public long getTimestamp() {
         return timestamp;
     }
+
+    public void triggerAlert(){
+        System.out.println("Alert " + condition + " for patient " + patientId + " at " + timestamp);    }
 }

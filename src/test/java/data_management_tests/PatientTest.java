@@ -2,33 +2,39 @@ package data_management_tests;
 
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PatientTest {
+    private Patient patient;
 
-    /**
-     * Tests the addRecord and getRecords methods of the Patient class.
-     */
+    @BeforeEach
+    public void setUp() {
+        patient = new Patient(1);
+    }
+
     @Test
-    void testAddAndGetRecords() {
-        Patient patient = new Patient(1);
+    public void testAddRecord() {
+        patient.addRecord(1623254400000L, "HeartRate", 75.0);
+        List<PatientRecord> records = patient.getRecords(0, Long.MAX_VALUE);
+        assertEquals(1, records.size());
+        PatientRecord record = records.get(0);
+        assertEquals(1, record.getPatientId());
+        assertEquals(75.0, record.getMeasurementValue());
+        assertEquals("HeartRate", record.getRecordType());
+        assertEquals(1623254400000L, record.getTimestamp());
+    }
 
-        patient.addRecord(120, "HeartRate", 1621908000000L); // Heart rate record
-        patient.addRecord(140, "HeartRate", 1621908100000L); // Heart rate record
-        patient.addRecord(130, "HeartRate", 1621908200000L); // Heart rate record
-        patient.addRecord(120, "BloodPressure", 1621908300000L); // Blood pressure record
-        patient.addRecord(110, "BloodPressure", 1621908400000L); // Blood pressure record
-        patient.addRecord(100, "BloodPressure", 1621908500000L); // Blood pressure record
-
-        List<PatientRecord> records = patient.getRecords(1621908100000L, 1621908400000L);
-
-        assertEquals(4, records.size());
-
-        assertEquals(140, records.get(0).getMeasurementValue());
-        assertEquals(130, records.get(1).getMeasurementValue());
-        assertEquals(120, records.get(2).getMeasurementValue());
-        assertEquals(110, records.get(3).getMeasurementValue());
+    @Test
+    public void testGetRecordsWithinRange() {
+        patient.addRecord(1623254400000L, "HeartRate", 75.0);
+        patient.addRecord(1623254500000L, "BloodPressure", 120.0);
+        patient.addRecord(1623254600000L, "HeartRate", 80.0);
+        List<PatientRecord> records = patient.getRecords(1623254500000L, 1623254600000L);
+        assertEquals(2, records.size());
+        assertEquals("BloodPressure", records.get(0).getRecordType());
+        assertEquals("HeartRate", records.get(1).getRecordType());
     }
 }

@@ -9,82 +9,98 @@ import java.io.PrintWriter;
 import java.util.List;
 
 /**
- * The {@code AlertGenerator} class is responsible for monitoring patient data
- * and generating alerts when certain predefined conditions are met. This class
- * relies on a {@link DataStorage} instance to access patient data and evaluate
- * it against specific health criteria.
+ * This class generates alerts based on the patient's health data.
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
 
-    /**
-     * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
-     * The {@code DataStorage} is used to retrieve patient data that this class
-     * will monitor and evaluate.
-     *
-     * @param dataStorage the data storage system that provides access to patient
-     *                    data
-     */
     public AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
     }
 
     /**
-     * Evaluates the specified patient's data to determine if any alert conditions
-     * are met. If a condition is met, an alert is triggered via the
-     * {@link #triggerAlert}
-     * method. This method should define the specific conditions under which an
-     * alert
-     * will be triggered.
+     * Evaluates the patient's health data and triggers alerts if necessary.
      *
+     * @param patientId the ID of the patient
      */
     public void evaluateData(int patientId) {
         List<PatientRecord> records = dataStorage.getRecords(patientId, System.currentTimeMillis() - 3600000L, System.currentTimeMillis());
 
         for (int i = 0; i < records.size(); i++) {
             PatientRecord record = records.get(i);
+            String recordType = record.getRecordType();
 
-            if (record.getRecordType().equals("BloodPressure")) {
-                if (i >= 2) {
-                    if (isIncreasingTrend(records, i) || isDecreasingTrend(records, i)) {
-                        triggerAlert(new Alert(patientId, "Blood Pressure Trend Alert", record.getTimestamp()));
-                    }
-                }
-                // Critical Threshold Alert
-                double systolicPressure = record.getMeasurementValue();
-                double diastolicPressure = records.get(i + 1).getMeasurementValue();
-                if (systolicPressure > 180 || systolicPressure < 90 || diastolicPressure > 120 || diastolicPressure < 60) {
-                    triggerAlert(new Alert(patientId, "Critical Blood Pressure Alert", record.getTimestamp()));
-                }
-            }
-
-            else if (record.getRecordType().equals("BloodSaturation")) {
-                double saturation = record.getMeasurementValue();
-                if (saturation < 92) {
-                    triggerAlert(new Alert(patientId, "Low Saturation Alert", record.getTimestamp()));
-                }
-                if (i >= 6 && isRapidDrop(records, i)) {
-                    triggerAlert(new Alert(patientId, "Rapid Drop Alert", record.getTimestamp()));
-                }
-            }
-
-            else if (record.getRecordType().equals("BloodPressure") && records.get(i + 1).getRecordType().equals("BloodSaturation")) {
-                double systolicPressure = record.getMeasurementValue();
-                double saturation = records.get(i + 1).getMeasurementValue();
-                if (systolicPressure < 90 && saturation < 92) {
-                    triggerAlert(new Alert(patientId, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
-                }
-            }
-
-            else if (record.getRecordType().equals("ECG")) {
-                int heartRate = (int) record.getMeasurementValue();
-                if (heartRate < 50 || heartRate > 100) {
-                    triggerAlert(new Alert(patientId, "Abnormal Heart Rate Alert", record.getTimestamp()));
-                }
+            if (recordType.equals("BloodPressure")) {
+                evaluateBloodPressure(records, i, patientId);
+            } else if (recordType.equals("BloodSaturation")) {
+                evaluateBloodSaturation(records, i, patientId);
+            } else if (recordType.equals("ECG")) {
+                evaluateECG(records, i, patientId);
             }
         }
     }
 
+    /**
+     * Evaluates the patient's blood pressure data and triggers alerts if necessary.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @param patientId  the ID of the patient
+     */
+    private void evaluateBloodPressure(List<PatientRecord> records, int currentIndex, int patientId) {
+        PatientRecord record = records.get(currentIndex);
+        if (currentIndex >= 2) {
+            if (isIncreasingTrend(records, currentIndex) || isDecreasingTrend(records, currentIndex)) {
+                triggerAlert(new Alert(patientId, "Blood Pressure Trend Alert", record.getTimestamp()));
+            }
+        }
+        double systolicPressure = record.getMeasurementValue();
+        double diastolicPressure = records.get(currentIndex).getMeasurementValue();
+        if (systolicPressure > 180 || systolicPressure < 90 || diastolicPressure > 120 || diastolicPressure < 60) {
+            triggerAlert(new Alert(patientId, "Critical Blood Pressure Alert", record.getTimestamp()));
+        }
+    }
+
+    /**
+     * Evaluates the patient's blood saturation data and triggers alerts if necessary.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @param patientId  the ID of the patient
+     */
+    private void evaluateBloodSaturation(List<PatientRecord> records, int currentIndex, int patientId) {
+        PatientRecord record = records.get(currentIndex);
+        double saturation = record.getMeasurementValue();
+        if (saturation < 92) {
+            triggerAlert(new Alert(patientId, "Low Saturation Alert", record.getTimestamp()));
+        }
+        if (currentIndex >= 6 && isRapidDrop(records, currentIndex)) {
+            triggerAlert(new Alert(patientId, "Rapid Drop Alert", record.getTimestamp()));
+        }
+    }
+
+    /**
+     * Evaluates the patient's ECG data and triggers alerts if necessary.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @param patientId  the ID of the patient
+     */
+    private void evaluateECG(List<PatientRecord> records, int currentIndex, int patientId) {
+        PatientRecord record = records.get(currentIndex);
+        int heartRate = (int) record.getMeasurementValue();
+        if (heartRate < 50 || heartRate > 100) {
+            triggerAlert(new Alert(patientId, "Abnormal Heart Rate Alert", record.getTimestamp()));
+        }
+    }
+
+    /**
+     * Checks if the blood pressure is in an increasing trend.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @return true if the blood pressure is in an increasing trend, false otherwise
+     */
     private boolean isIncreasingTrend(List<PatientRecord> records, int currentIndex) {
         double previousValue = records.get(currentIndex - 2).getMeasurementValue();
         double currentValue = records.get(currentIndex - 1).getMeasurementValue();
@@ -93,6 +109,13 @@ public class AlertGenerator {
         return (currentValue - previousValue > 10) && (nextValue - currentValue > 10);
     }
 
+    /**
+     * Checks if the blood pressure is in a decreasing trend.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @return true if the blood pressure is in a decreasing trend, false otherwise
+     */
     private boolean isDecreasingTrend(List<PatientRecord> records, int currentIndex) {
         double previousValue = records.get(currentIndex - 2).getMeasurementValue();
         double currentValue = records.get(currentIndex - 1).getMeasurementValue();
@@ -101,6 +124,13 @@ public class AlertGenerator {
         return (previousValue - currentValue > 10) && (currentValue - nextValue > 10);
     }
 
+    /**
+     * Checks if the blood saturation is rapidly dropping.
+     *
+     * @param records    the patient's health records
+     * @param currentIndex the index of the current record
+     * @return true if the blood saturation is rapidly dropping, false otherwise
+     */
     private boolean isRapidDrop(List<PatientRecord> records, int currentIndex) {
         double currentSaturation = records.get(currentIndex).getMeasurementValue();
         double previousSaturation = records.get(currentIndex - 1).getMeasurementValue();
@@ -115,12 +145,9 @@ public class AlertGenerator {
     }
 
     /**
-     * Triggers an alert for the monitoring system. This method can be extended to
-     * notify medical staff, log the alert, or perform other actions. The method
-     * currently assumes that the alert information is fully formed when passed as
-     * an argument.
+     * Triggers an alert for the patient.
      *
-     * @param alert the alert object containing details about the alert condition
+     * @param alert the alert to trigger
      */
     public void triggerAlert(Alert alert) {
         System.out.println("Alert Triggered:");
@@ -137,6 +164,5 @@ public class AlertGenerator {
         } catch (IOException e) {
             System.err.println("Error writing alert to log file: " + e.getMessage());
         }
-
     }
 }

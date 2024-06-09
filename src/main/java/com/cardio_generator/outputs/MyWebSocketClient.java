@@ -4,9 +4,7 @@ import com.data_management.DataReader2;
 import com.data_management.DataStorage;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import static com.data_management.CheckData.isValidMessage;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 

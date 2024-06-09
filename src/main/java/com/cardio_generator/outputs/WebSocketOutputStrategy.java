@@ -67,7 +67,6 @@ public class WebSocketOutputStrategy implements OutputStrategy {
             try {
                 measurement = Double.parseDouble(data);
             } catch (NumberFormatException e) {
-                // Handle parsing errors, set default value
                 measurement = 0.0;
                 System.err.println("Error parsing data: " + data);
             }

@@ -37,7 +37,7 @@ public class MyWebSocketServer extends WebSocketServer {
      */
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        // Handle when a client disconnects
+        System.out.println("Connection closed by " + (remote ? "remote peer" : "us") + " Code: " + code + " Reason: " + reason);
     }
 
     /**
@@ -48,7 +48,7 @@ public class MyWebSocketServer extends WebSocketServer {
      */
     @Override
     public void onMessage(WebSocket conn, String message) {
-        // Handle incoming messages from clients
+        System.out.println("Received message from " + conn.getRemoteSocketAddress() + ": " + message);
     }
 
     /**
@@ -59,7 +59,7 @@ public class MyWebSocketServer extends WebSocketServer {
      */
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        // Handle any errors that occur
+        System.err.println("An error occurred on connection " + conn.getRemoteSocketAddress()  + ":" + ex);
     }
 
     /**

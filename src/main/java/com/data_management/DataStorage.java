@@ -1,22 +1,26 @@
 package com.data_management;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.alerts.AlertGenerator;
+import com.cardio_generator.outputs.MyWebSocketClient;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring system.
  * This class serves as a repository for all patient records, organized by patient IDs.
  */
 public class DataStorage {
+    private static DataStorage instance;
     private ConcurrentMap<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
 
     public DataStorage() {
         this.patientMap = new ConcurrentHashMap<>();
+
     }
 
     /**
@@ -63,6 +67,17 @@ public class DataStorage {
         return new ArrayList<>(patientMap.values());
     }
 
+    public static DataStorage getInstance(){
+        if (instance==null){
+            synchronized (DataStorage.class){
+                if (instance==null){
+                    instance = new DataStorage();
+                }
+            }
+        }
+        return instance;
+    }
+
     /**
      * The main method for the DataStorage class.
      * Initializes the system, reads data into storage, and continuously monitors and evaluates patient data.
@@ -70,14 +85,22 @@ public class DataStorage {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        DataStorage storage = new DataStorage();
-
-        // Initialize the OutputFileDataReader with the output directory
-        // Use an absolute path here to ensure correctness
-        String outputDirectory = "C:/Users/Admin/Desktop/University/Period 5/Software engineering/signal_project/output";
-        OutputFileDataReader reader = new OutputFileDataReader(outputDirectory);
-
         try {
+            DataStorage storage = DataStorage.getInstance();
+            //DataStorage storage = new DataStorage();
+            URI url = new URI("ws://localhost:8080");
+            DataReader2 reader = new MyWebSocketClient(url, storage);
+            reader.readRealTimeData(url.toString(), storage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+       /* DataStorage storage = new DataStorage();
+
+        String outputDirectory = "C:/Users/Admin/Desktop/University/Period 5/Software engineering/signal_project/output";
+        OutputFileDataReader reader = new OutputFileDataReader(outputDirectory);*/
+
+/*        try {
             reader.readData(storage);
 
             List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
@@ -102,5 +125,5 @@ public class DataStorage {
         } catch (IOException e) {
             System.err.println("Error reading data from output file: " + e.getMessage());
         }
-    }
+    }*/
 }

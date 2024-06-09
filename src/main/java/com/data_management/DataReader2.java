@@ -7,10 +7,10 @@ public interface DataReader2 {
     /**
      * Connects to a WebSocket server and reads data continuously.
      *
-     * @param uri the WebSocket server URI
+     * @param url the WebSocket server URI
      * @param dataStorage the storage where data will be stored
      * @throws URISyntaxException if the URI is incorrect
      * @throws InterruptedException if the connection is interrupted
      */
-    void readRealTimeData(String uri, DataStorage dataStorage) throws URISyntaxException, InterruptedException;
+    void readRealTimeData(String url, DataStorage dataStorage) throws URISyntaxException, InterruptedException;
 }

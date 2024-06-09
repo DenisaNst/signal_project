@@ -25,7 +25,7 @@ public class OutputFileDataReader implements DataReader2 {
      * @param dataStorage the storage where data will be stored
      * @throws IOException
      */
-    public void readData(DataStorage dataStorage) throws IOException { // Not overriding any method in the interface
+    public void readData(DataStorage dataStorage) throws IOException {
         Path outputDirPath = Paths.get(outputDirectory);
         if (!Files.exists(outputDirPath) || !Files.isDirectory(outputDirPath)) {
             throw new IOException("Output directory not found: " + outputDirPath);
